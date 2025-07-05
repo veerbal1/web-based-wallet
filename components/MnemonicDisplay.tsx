@@ -20,9 +20,7 @@ export default function MnemonicDisplay({ mnemonic }: MnemonicDisplayProps) {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(mnemonic);
-      toast("Copied to clipboard", {
-        position: "top-center",
-      });
+      toast("Copied to clipboard");
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
