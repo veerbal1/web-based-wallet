@@ -14,9 +14,12 @@ import { ethers } from "ethers";
 import * as bip32 from "bip32";
 import * as ecc from "tiny-secp256k1";
 import * as bitcoin from "bitcoinjs-lib";
+import { ECPairFactory } from "ecpair";
 
 // Initialize bip32 with secp256k1
 const BIP32 = bip32.BIP32Factory(ecc);
+// Initialize ECPair factory
+const ECPair = ECPairFactory(ecc);
 
 interface WalletInfo {
   chainTitle: string;
@@ -78,6 +81,7 @@ export default function Home() {
   const generateBitcoinWallet = (mnemonic: string, accountIndex: number): WalletInfo => {
     const seedBuffer = mnemonicToSeedSync(mnemonic);
     const root = BIP32.fromSeed(seedBuffer);
+    // Use native SegWit derivation path (same as Phantom)
     const path = `m/84'/0'/0'/0/${accountIndex}`;
     const child = root.derivePath(path);
     
@@ -85,7 +89,11 @@ export default function Home() {
       throw new Error("Failed to derive private key");
     }
     
-    const privateKey = Buffer.from(child.privateKey).toString("hex");
+    // Convert private key to WIF compressed format (starts with 'L' or 'K')
+    const privateKeyWIF = ECPair.fromPrivateKey(
+      Buffer.from(child.privateKey),
+      { network: bitcoin.networks.bitcoin }
+    ).toWIF();
     
     // Generate native SegWit (bech32) address - same as Phantom
     const { address } = bitcoin.payments.p2wpkh({
@@ -99,7 +107,7 @@ export default function Home() {
     
     return {
       chainTitle: "Bitcoin",
-      privateKey: privateKey,
+      privateKey: privateKeyWIF,
       publicKey: address,
     };
   };
