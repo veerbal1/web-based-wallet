@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import WalletDisplay from "@/components/WalletDisplay";
 import { WalletRow } from "@/types/wallet";
 
@@ -6,6 +7,22 @@ interface WalletRowsDisplayProps {
 }
 
 export default function WalletRowsDisplay({ walletRows }: WalletRowsDisplayProps) {
+  const [newWalletIndex, setNewWalletIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (walletRows.length > 0) {
+      const latestIndex = walletRows.length - 1;
+      setNewWalletIndex(latestIndex);
+      
+      // Remove the highlight after animation
+      const timer = setTimeout(() => {
+        setNewWalletIndex(null);
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [walletRows.length]);
+
   if (walletRows.length === 0) {
     return null;
   }
@@ -20,9 +37,21 @@ export default function WalletRowsDisplay({ walletRows }: WalletRowsDisplayProps
       
       <div className="space-y-8">
         {walletRows.map((walletRow, rowIndex) => (
-          <div key={rowIndex} className="space-y-4">
+          <div 
+            key={rowIndex} 
+            className={`space-y-4 transition-all duration-1000 ${
+              newWalletIndex === rowIndex 
+                ? 'animate-pulse bg-green-50 dark:bg-green-900/10 p-4 rounded-xl border border-green-200 dark:border-green-800' 
+                : 'rounded-xl'
+            }`}
+          >
             <h3 className="text-lg font-medium text-foreground">
               Wallet {rowIndex + 1}
+              {newWalletIndex === rowIndex && (
+                <span className="ml-2 text-sm font-normal text-green-600 dark:text-green-400">
+                  ✨ New!
+                </span>
+              )}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {walletRow.wallets.map((wallet, walletIndex) => (

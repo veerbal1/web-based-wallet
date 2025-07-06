@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { generateMnemonic } from "bip39";
+import { toast } from "sonner";
 import { WalletState } from "@/types/wallet";
 import { generateWalletRow } from "@/lib/wallet-generators";
 
@@ -28,6 +29,19 @@ export const useWalletState = () => {
       mnemonic: currentMnemonic,
       walletRows: [...prevState.walletRows, newWalletRow],
     }));
+
+    // Show success toast
+    toast.success(`Wallet ${nextIndex + 1} added successfully!`, {
+      description: "New Solana, Ethereum, and Bitcoin wallets generated",
+    });
+
+    // Scroll to bottom to show new wallet
+    setTimeout(() => {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth'
+      });
+    }, 100);
   };
 
   const handleGenerateNewWallet = () => {
@@ -38,6 +52,11 @@ export const useWalletState = () => {
     setWalletState({
       mnemonic: newMnemonic,
       walletRows: [firstWalletRow],
+    });
+
+    // Show success toast
+    toast.success("New wallet created successfully!", {
+      description: "Seed phrase generated and first wallet row created",
     });
   };
 
@@ -51,6 +70,11 @@ export const useWalletState = () => {
     setWalletState({
       mnemonic: mnemonic,
       walletRows: [],
+    });
+
+    // Show success toast
+    toast.success("Seed phrase imported successfully!", {
+      description: "Click 'Add Wallet' to generate wallets from this seed phrase",
     });
   };
 

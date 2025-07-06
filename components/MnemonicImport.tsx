@@ -34,7 +34,6 @@ export default function MnemonicImport({ onImport, disabled }: MnemonicImportPro
 
       onImport(mnemonic);
       setInputMnemonic("");
-      toast.success("Seed phrase imported successfully!");
     } catch (error) {
       toast.error("Failed to import seed phrase");
       console.error("Import error:", error);
