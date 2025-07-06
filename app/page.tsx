@@ -65,7 +65,7 @@ export default function Home() {
       throw new Error("Failed to derive private key");
     }
     
-    const privateKey = Buffer.from(child.privateKey).toString("hex");
+    const privateKey = "0x" + Buffer.from(child.privateKey).toString("hex");
     const wallet = new ethers.Wallet(privateKey);
     
     return {
