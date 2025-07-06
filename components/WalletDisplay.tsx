@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Eye, EyeOff, Copy } from "lucide-react";
+import { getChainIcon } from "@/lib/chain-icons";
+import Image from "next/image";
 
 interface WalletDisplayProps {
   privateKey: string;
@@ -37,9 +39,18 @@ export default function WalletDisplay({
     <div className="w-full max-w-2xl mx-auto p-3 sm:p-4 bg-card rounded-lg border shadow-sm">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm sm:text-base font-semibold text-foreground">
-            {chainTitle} Wallet
-          </h2>
+          <div className="flex items-center gap-3">
+            <Image
+              src={getChainIcon(chainTitle)}
+              alt={`${chainTitle} icon`}
+              width={24}
+              height={24}
+              className="w-6 h-6"
+            />
+            <h2 className="text-sm sm:text-base font-semibold text-foreground">
+              {chainTitle} Wallet
+            </h2>
+          </div>
           <div className="text-xs text-muted-foreground bg-primary/10 px-2 py-1 rounded">
             {chainTitle}
           </div>
