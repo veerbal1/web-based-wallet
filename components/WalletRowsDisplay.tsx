@@ -1,13 +1,11 @@
-import { Button } from "@/components/ui/button";
 import WalletDisplay from "@/components/WalletDisplay";
 import { WalletRow } from "@/types/wallet";
 
 interface WalletRowsDisplayProps {
   walletRows: WalletRow[];
-  onAddWallet: () => void;
 }
 
-export default function WalletRowsDisplay({ walletRows, onAddWallet }: WalletRowsDisplayProps) {
+export default function WalletRowsDisplay({ walletRows }: WalletRowsDisplayProps) {
   if (walletRows.length === 0) {
     return null;
   }
@@ -18,9 +16,6 @@ export default function WalletRowsDisplay({ walletRows, onAddWallet }: WalletRow
         <h2 className="text-xl font-semibold text-foreground">
           Your Wallets
         </h2>
-        <Button onClick={onAddWallet} variant="outline">
-          Add Wallet Row
-        </Button>
       </div>
       
       <div className="space-y-8">

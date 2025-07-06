@@ -30,14 +30,40 @@ export const useWalletState = () => {
     }));
   };
 
+  const handleGenerateNewWallet = () => {
+    // Generate new mnemonic and create first wallet row
+    const newMnemonic = generateMnemonic();
+    const firstWalletRow = generateWalletRow(newMnemonic, 0);
+    
+    setWalletState({
+      mnemonic: newMnemonic,
+      walletRows: [firstWalletRow],
+    });
+  };
+
   const handleGenerateMnemonic = () => {
     const mnemonic = generateMnemonic();
     setWalletState(prevState => ({ ...prevState, mnemonic }));
   };
 
+  const handleImportMnemonic = (mnemonic: string) => {
+    // Clear existing wallets and set new mnemonic
+    setWalletState({
+      mnemonic: mnemonic,
+      walletRows: [],
+    });
+  };
+
+  const hasExistingWallets = walletState.walletRows.length > 0;
+  const hasAnyContent = !!walletState.mnemonic || hasExistingWallets;
+
   return {
     walletState,
     handleCreateWallet,
+    handleGenerateNewWallet,
     handleGenerateMnemonic,
+    handleImportMnemonic,
+    hasExistingWallets,
+    hasAnyContent,
   };
 }; 
