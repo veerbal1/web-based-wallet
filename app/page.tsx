@@ -13,6 +13,7 @@ import bs58 from "bs58";
 import { ethers } from "ethers";
 import * as bip32 from "bip32";
 import * as ecc from "tiny-secp256k1";
+import * as bitcoin from "bitcoinjs-lib";
 
 // Initialize bip32 with secp256k1
 const BIP32 = bip32.BIP32Factory(ecc);
@@ -74,6 +75,35 @@ export default function Home() {
     };
   };
 
+  const generateBitcoinWallet = (mnemonic: string, accountIndex: number): WalletInfo => {
+    const seedBuffer = mnemonicToSeedSync(mnemonic);
+    const root = BIP32.fromSeed(seedBuffer);
+    const path = `m/84'/0'/0'/0/${accountIndex}`;
+    const child = root.derivePath(path);
+    
+    if (!child.privateKey) {
+      throw new Error("Failed to derive private key");
+    }
+    
+    const privateKey = Buffer.from(child.privateKey).toString("hex");
+    
+    // Generate native SegWit (bech32) address - same as Phantom
+    const { address } = bitcoin.payments.p2wpkh({
+      pubkey: Buffer.from(child.publicKey),
+      network: bitcoin.networks.bitcoin,
+    });
+    
+    if (!address) {
+      throw new Error("Failed to generate Bitcoin address");
+    }
+    
+    return {
+      chainTitle: "Bitcoin",
+      privateKey: privateKey,
+      publicKey: address,
+    };
+  };
+
   const handleCreateWallet = () => {
     let currentMnemonic = walletState.mnemonic;
     
@@ -85,14 +115,15 @@ export default function Home() {
     // Get the next wallet index
     const nextIndex = walletState.walletRows.length;
     
-    // Generate both Solana and Ethereum wallets for this index
+    // Generate wallets for all three chains
     const solanaWallet = generateSolanaWallet(currentMnemonic, nextIndex);
     const ethereumWallet = generateEthereumWallet(currentMnemonic, nextIndex);
+    const bitcoinWallet = generateBitcoinWallet(currentMnemonic, nextIndex);
     
     // Create new wallet row
     const newWalletRow: WalletRow = {
       index: nextIndex,
-      wallets: [solanaWallet, ethereumWallet],
+      wallets: [solanaWallet, ethereumWallet, bitcoinWallet],
     };
     
     // Update state
@@ -132,7 +163,7 @@ export default function Home() {
                   <h3 className="text-lg font-medium text-foreground">
                     Wallet {rowIndex + 1}
                   </h3>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {walletRow.wallets.map((wallet, walletIndex) => (
                       <WalletDisplay
                         key={`${rowIndex}-${walletIndex}`}
